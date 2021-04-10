@@ -8,11 +8,71 @@
 import UIKit
 
 class WeatherView: UIView {
+    private let imageLabelStackView: UIStackView = UIStackView()
+    private let labelStackView: UIStackView = UIStackView()
+    private let weatherImageView: UIImageView = UIImageView()
+    private let maxTemperatureLabel: UILabel = UILabel()
+    private let minTemperatureLabel: UILabel = UILabel()
+
+    private let closeButton: UIButton = UIButton()
+    private let reloadButton: UIButton = UIButton()
+
     override func layoutSubviews() {
         setup()
     }
 
     private func setup() {
         backgroundColor = .systemBackground
+
+        setupSubviews()
+    }
+
+    private func setupSubviews() {
+        setupImageLabelStackView()
+        setupLabelStackView()
+        setupViews()
+    }
+
+    private func setupImageLabelStackView() {
+        addSubview(imageLabelStackView)
+
+        imageLabelStackView.addArrangedSubview(weatherImageView)
+        imageLabelStackView.addArrangedSubview(labelStackView)
+
+        imageLabelStackView.translatesAutoresizingMaskIntoConstraints = false
+        imageLabelStackView.axis = .vertical
+
+        NSLayoutConstraint.activate([
+            imageLabelStackView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            imageLabelStackView.centerXAnchor.constraint(equalTo: centerXAnchor)
+        ])
+    }
+
+    private func setupLabelStackView() {
+        labelStackView.translatesAutoresizingMaskIntoConstraints = false
+        labelStackView.axis = .horizontal
+    }
+
+    private func setupViews() {
+        labelStackView.addArrangedSubview(minTemperatureLabel)
+        labelStackView.addArrangedSubview(maxTemperatureLabel)
+
+        weatherImageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            weatherImageView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5),
+            weatherImageView.heightAnchor.constraint(equalTo: weatherImageView.widthAnchor)
+        ])
+
+        minTemperatureLabel.text = "--"
+        maxTemperatureLabel.text = "--"
+        minTemperatureLabel.textColor = .blue
+        maxTemperatureLabel.textColor = .red
+        minTemperatureLabel.textAlignment = .center
+        maxTemperatureLabel.textAlignment = .center
+
+        NSLayoutConstraint.activate([
+            minTemperatureLabel.widthAnchor.constraint(equalTo: weatherImageView.widthAnchor, multiplier: 0.5),
+            maxTemperatureLabel.widthAnchor.constraint(equalTo: weatherImageView.widthAnchor, multiplier: 0.5)
+        ])
     }
 }
