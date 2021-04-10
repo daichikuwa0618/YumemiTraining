@@ -30,7 +30,9 @@ class WeatherView: UIView {
     private func setupSubviews() {
         setupImageLabelStackView()
         setupLabelStackView()
-        setupViews()
+        setupWeatherImageView()
+        setupTemperatureLabels()
+        setupButtons()
     }
 
     private func setupImageLabelStackView() {
@@ -56,14 +58,16 @@ class WeatherView: UIView {
         labelStackView.axis = .horizontal
     }
 
-    private func setupViews() {
+    private func setupWeatherImageView() {
         weatherImageView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             weatherImageView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5),
             weatherImageView.heightAnchor.constraint(equalTo: weatherImageView.widthAnchor)
         ])
+    }
 
+    private func setupTemperatureLabels() {
         minTemperatureLabel.translatesAutoresizingMaskIntoConstraints = false
         maxTemperatureLabel.translatesAutoresizingMaskIntoConstraints = false
 
@@ -78,7 +82,9 @@ class WeatherView: UIView {
             minTemperatureLabel.widthAnchor.constraint(equalTo: weatherImageView.widthAnchor, multiplier: 0.5),
             maxTemperatureLabel.widthAnchor.constraint(equalTo: weatherImageView.widthAnchor, multiplier: 0.5)
         ])
+    }
 
+    private func setupButtons() {
         addSubview(closeButton)
         addSubview(reloadButton)
 
