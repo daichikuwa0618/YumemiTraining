@@ -8,4 +8,11 @@
 import UIKit
 
 class WeatherView: UIView {
+    override func layoutSubviews() {
+        setup()
+    }
+
+    private func setup() {
+        backgroundColor = .systemBackground
+    }
 }
