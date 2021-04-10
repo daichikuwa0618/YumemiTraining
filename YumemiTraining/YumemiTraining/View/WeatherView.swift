@@ -49,24 +49,28 @@ class WeatherView: UIView {
     }
 
     private func setupLabelStackView() {
+        labelStackView.addArrangedSubview(minTemperatureLabel)
+        labelStackView.addArrangedSubview(maxTemperatureLabel)
+
         labelStackView.translatesAutoresizingMaskIntoConstraints = false
         labelStackView.axis = .horizontal
     }
 
     private func setupViews() {
-        labelStackView.addArrangedSubview(minTemperatureLabel)
-        labelStackView.addArrangedSubview(maxTemperatureLabel)
-
         weatherImageView.translatesAutoresizingMaskIntoConstraints = false
+
         NSLayoutConstraint.activate([
             weatherImageView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5),
             weatherImageView.heightAnchor.constraint(equalTo: weatherImageView.widthAnchor)
         ])
 
+        minTemperatureLabel.translatesAutoresizingMaskIntoConstraints = false
+        maxTemperatureLabel.translatesAutoresizingMaskIntoConstraints = false
+
         minTemperatureLabel.text = "--"
         maxTemperatureLabel.text = "--"
-        minTemperatureLabel.textColor = .blue
-        maxTemperatureLabel.textColor = .red
+        minTemperatureLabel.textColor = .systemBlue
+        maxTemperatureLabel.textColor = .systemRed
         minTemperatureLabel.textAlignment = .center
         maxTemperatureLabel.textAlignment = .center
 
