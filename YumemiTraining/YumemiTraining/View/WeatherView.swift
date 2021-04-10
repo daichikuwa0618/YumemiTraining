@@ -7,7 +7,8 @@
 
 import UIKit
 
-class WeatherView: UIView {
+final class WeatherView: UIView {
+
     private let imageLabelStackView: UIStackView = UIStackView()
     private let labelStackView: UIStackView = UIStackView()
     private let weatherImageView: UIImageView = UIImageView()
@@ -18,6 +19,8 @@ class WeatherView: UIView {
     private let reloadButton: UIButton = UIButton(type: .system)
 
     override func layoutSubviews() {
+        super.layoutSubviews()
+
         setup()
     }
 
