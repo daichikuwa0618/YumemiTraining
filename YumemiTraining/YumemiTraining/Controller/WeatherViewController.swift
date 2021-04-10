@@ -1,13 +1,13 @@
 //
-//  ViewController.swift
+//  WeatherViewController.swift
 //  YumemiTraining
 //
-//  Created by Daichi Private on 2021/04/10.
+//  Created by Daichi Hayashi on 2021/04/10.
 //
 
 import UIKit
 
-class ViewController: UIViewController {
+class WeatherViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
