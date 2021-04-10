@@ -15,6 +15,7 @@
 		8BB14F2126219A53002C945A /* YumemiTrainingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB14F2026219A53002C945A /* YumemiTrainingTests.swift */; };
 		8BB14F2C26219A53002C945A /* YumemiTrainingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB14F2B26219A53002C945A /* YumemiTrainingUITests.swift */; };
 		8BB14F3E26219C7A002C945A /* YumemiWeather in Frameworks */ = {isa = PBXBuildFile; productRef = 8BB14F3D26219C7A002C945A /* YumemiWeather */; };
+		8BB14F4F2621A100002C945A /* WeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB14F4E2621A100002C945A /* WeatherView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		8BB14F2726219A53002C945A /* YumemiTrainingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YumemiTrainingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BB14F2B26219A53002C945A /* YumemiTrainingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YumemiTrainingUITests.swift; sourceTree = "<group>"; };
 		8BB14F2D26219A53002C945A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8BB14F4E2621A100002C945A /* WeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,11 +101,11 @@
 		8BB14F0826219A4E002C945A /* YumemiTraining */ = {
 			isa = PBXGroup;
 			children = (
+				8BB14F4D2621A0A6002C945A /* Controller */,
+				8BB14F4C2621A097002C945A /* View */,
+				8BB14F4B2621A072002C945A /* Resource */,
 				8BB14F0926219A4E002C945A /* AppDelegate.swift */,
 				8BB14F0B26219A4E002C945A /* SceneDelegate.swift */,
-				8BB14F0D26219A4E002C945A /* WeatherViewController.swift */,
-				8BB14F1226219A52002C945A /* Assets.xcassets */,
-				8BB14F1426219A52002C945A /* LaunchScreen.storyboard */,
 				8BB14F1726219A52002C945A /* Info.plist */,
 			);
 			path = YumemiTraining;
@@ -125,6 +127,31 @@
 				8BB14F2D26219A53002C945A /* Info.plist */,
 			);
 			path = YumemiTrainingUITests;
+			sourceTree = "<group>";
+		};
+		8BB14F4B2621A072002C945A /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				8BB14F1226219A52002C945A /* Assets.xcassets */,
+				8BB14F1426219A52002C945A /* LaunchScreen.storyboard */,
+			);
+			path = Resource;
+			sourceTree = "<group>";
+		};
+		8BB14F4C2621A097002C945A /* View */ = {
+			isa = PBXGroup;
+			children = (
+				8BB14F4E2621A100002C945A /* WeatherView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		8BB14F4D2621A0A6002C945A /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				8BB14F0D26219A4E002C945A /* WeatherViewController.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -265,6 +292,7 @@
 				8BB14F0E26219A4E002C945A /* WeatherViewController.swift in Sources */,
 				8BB14F0A26219A4E002C945A /* AppDelegate.swift in Sources */,
 				8BB14F0C26219A4E002C945A /* SceneDelegate.swift in Sources */,
+				8BB14F4F2621A100002C945A /* WeatherView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
