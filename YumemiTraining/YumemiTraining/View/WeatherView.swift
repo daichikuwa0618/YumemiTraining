@@ -14,8 +14,8 @@ class WeatherView: UIView {
     private let maxTemperatureLabel: UILabel = UILabel()
     private let minTemperatureLabel: UILabel = UILabel()
 
-    private let closeButton: UIButton = UIButton()
-    private let reloadButton: UIButton = UIButton()
+    private let closeButton: UIButton = UIButton(type: .system)
+    private let reloadButton: UIButton = UIButton(type: .system)
 
     override func layoutSubviews() {
         setup()
@@ -74,5 +74,34 @@ class WeatherView: UIView {
             minTemperatureLabel.widthAnchor.constraint(equalTo: weatherImageView.widthAnchor, multiplier: 0.5),
             maxTemperatureLabel.widthAnchor.constraint(equalTo: weatherImageView.widthAnchor, multiplier: 0.5)
         ])
+
+        addSubview(closeButton)
+        addSubview(reloadButton)
+
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        reloadButton.translatesAutoresizingMaskIntoConstraints = false
+
+        closeButton.setTitle("Close", for: .normal)
+        reloadButton.setTitle("Reload", for: .normal)
+
+        closeButton.addAction(.init { _ in self.tapClose() }, for: .touchUpInside)
+        reloadButton.addAction(.init { _ in self.tapReload() }, for: .touchUpInside)
+
+        NSLayoutConstraint.activate([
+            closeButton.topAnchor.constraint(equalTo: imageLabelStackView.bottomAnchor, constant: 80),
+            reloadButton.topAnchor.constraint(equalTo: imageLabelStackView.bottomAnchor, constant: 80),
+            closeButton.centerXAnchor.constraint(equalTo: minTemperatureLabel.centerXAnchor),
+            reloadButton.centerXAnchor.constraint(equalTo: maxTemperatureLabel.centerXAnchor)
+        ])
+    }
+
+    @objc
+    private func tapClose() {
+        print("Close button tapped.")
+    }
+
+    @objc
+    private func tapReload() {
+        print("Reload button tapped.")
     }
 }
