@@ -7,9 +7,10 @@
 
 import UIKit
 
-final class WeatherViewController: UIViewController {
+final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
-    private let weatherView: WeatherView = WeatherView()
+    private let weatherView: WeatherViewProtocol = WeatherView()
+    private let weatherFetcher: WeatherFetcherProtocol = WeatherFetcher()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,6 +20,7 @@ final class WeatherViewController: UIViewController {
 
     private func setupWeatherView() {
         view.addSubview(weatherView)
+        weatherView.delegate = self
         weatherView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
@@ -27,6 +29,19 @@ final class WeatherViewController: UIViewController {
             weatherView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             weatherView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
         ])
+    }
+
+    // MARK: - WeatherViewDelegate
+    func close() {
+        print("close")
+    }
+
+    func reload() {
+        let weather = weatherFetcher.fetch()
+        let viewState = WeatherViewState(weather: weather)
+
+        weatherView.setWeatherImage(image: viewState.image,
+                                    color: viewState.color)
     }
 }
 

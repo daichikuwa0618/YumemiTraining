@@ -7,7 +7,20 @@
 
 import UIKit
 
-final class WeatherView: UIView {
+protocol WeatherViewDelegate: AnyObject {
+    func close()
+    func reload()
+}
+
+protocol WeatherViewProtocol: UIView {
+    var delegate: WeatherViewDelegate? { get set }
+
+    func setWeatherImage(image: UIImage, color: UIColor)
+}
+
+final class WeatherView: UIView, WeatherViewProtocol {
+
+    weak var delegate: WeatherViewDelegate?
 
     private let imageLabelStackView: UIStackView = UIStackView()
     private let labelStackView: UIStackView = UIStackView()
@@ -110,11 +123,17 @@ final class WeatherView: UIView {
 
     @objc
     private func tapClose() {
-        print("Close button tapped.")
+        delegate?.close()
     }
 
     @objc
     private func tapReload() {
-        print("Reload button tapped.")
+        delegate?.reload()
+    }
+
+    // MARK: - WeatherViewProtocol
+    func setWeatherImage(image: UIImage, color: UIColor) {
+        weatherImageView.image = image
+        weatherImageView.tintColor = color
     }
 }
