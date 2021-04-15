@@ -43,10 +43,31 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
             weatherView.setWeatherImage(image: viewState.image,
                                         color: viewState.color)
+
         } catch let error as AppError {
-            print(error)
+            let message: String = {
+                switch error {
+                case .invalidParameter:
+                    return "入力された値が不正です"
+
+                case .unknown:
+                    return "不明なエラーです"
+
+                case .unexpected:
+                    return "予期せぬエラーです"
+                }
+            }()
+
+            let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
+                                                                       message: message)
+
+            present(alert, animated: true)
+
         } catch {
             assertionFailure("unexpected")
+            let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
+                                                                       message: "予期せぬエラーです")
+            present(alert, animated: true)
         }
     }
 }
