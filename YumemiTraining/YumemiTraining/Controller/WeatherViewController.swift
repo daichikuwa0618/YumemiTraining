@@ -37,11 +37,17 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
     }
 
     func reload() {
-        let weather = weatherFetcher.fetch()
-        let viewState = WeatherViewState(weather: weather)
+        do {
+            let weather = try weatherFetcher.fetch()
+            let viewState = WeatherViewState(weather: weather)
 
-        weatherView.setWeatherImage(image: viewState.image,
-                                    color: viewState.color)
+            weatherView.setWeatherImage(image: viewState.image,
+                                        color: viewState.color)
+        } catch let error as AppError {
+            print(error)
+        } catch {
+            assertionFailure("unexpected")
+        }
     }
 }
 
