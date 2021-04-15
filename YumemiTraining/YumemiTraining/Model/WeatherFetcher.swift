@@ -13,7 +13,7 @@ protocol WeatherFetcherProtocol {
     func fetch() -> Weather
 }
 
-class WeatherFetcher: WeatherFetcherProtocol {
+final class WeatherFetcher: WeatherFetcherProtocol {
     func fetch() -> Weather {
         let fetchedString: String = YumemiWeather.fetchWeather()
         let weather: Weather = {
