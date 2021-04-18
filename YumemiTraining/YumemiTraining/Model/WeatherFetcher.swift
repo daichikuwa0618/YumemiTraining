@@ -30,10 +30,10 @@ final class WeatherFetcher: WeatherFetcherProtocol {
     func fetch() throws -> WeatherResponse {
         do {
             let nowDateString: String = dateFormatter.createString(from: Date())
-            let inputJsonString: String = #"{"area": "tokyo", "date": "\#(nowDateString)"}"#
+            let inputJsonString: String = #"{"area": "Tokyo", "date": "\#(nowDateString)"}"#
             let fetchedData: Data = try YumemiWeather.fetchWeather(inputJsonString).data(using: .utf8)!
 
-            let response = try! parseWeatherResponse(from: fetchedData)
+            let response = try parseWeatherResponse(from: fetchedData)
 
             return response
         } catch YumemiWeatherError.invalidParameterError {
@@ -41,6 +41,9 @@ final class WeatherFetcher: WeatherFetcherProtocol {
 
         } catch YumemiWeatherError.unknownError {
             throw AppError.unknown
+
+        } catch AppError.parse {
+            throw AppError.parse
 
         } catch {
             throw AppError.unexpected
