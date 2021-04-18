@@ -9,14 +9,20 @@ import UIKit
 
 final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
+    // MARK: - Private property
+
     private let weatherView: WeatherViewProtocol = WeatherView()
     private let weatherFetcher: WeatherFetcherProtocol = WeatherFetcher(dateFormatter: DateFormatterUtil())
+
+    // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupWeatherView()
     }
+
+    // MARK: - Private method
 
     private func setupWeatherView() {
         view.addSubview(weatherView)
