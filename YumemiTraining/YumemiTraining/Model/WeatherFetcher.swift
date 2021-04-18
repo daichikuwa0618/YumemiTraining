@@ -29,8 +29,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
 
     func fetch() throws -> WeatherResponse {
         do {
-            let nowDateString: String = dateFormatter.createString(from: Date())
-            let inputJsonString: String = #"{"area": "Tokyo", "date": "\#(nowDateString)"}"#
+            let inputJsonString: String = try createPostJSONString(with: Date())
             let fetchedData: Data = try Data(YumemiWeather.fetchWeather(inputJsonString).utf8)
 
             let response = try parseWeatherResponse(from: fetchedData)
@@ -72,6 +71,21 @@ final class WeatherFetcher: WeatherFetcherProtocol {
             let value: WeatherResponse = try decoder.decode(WeatherResponse.self, from: data)
 
             return value
+        } catch {
+            throw AppError.parse
+        }
+    }
+
+    private func createPostJSONString(with date: Date) throws -> String {
+        do {
+            let encoder: JSONEncoder = JSONEncoder()
+            let dateString: String = dateFormatter.createString(from: date)
+            let object: WeatherPostObject = WeatherPostObject(area: "Tokyo",
+                                                              dateString: dateString)
+
+            let data: Data = try encoder.encode(object)
+
+            return String(data: data, encoding: .utf8)!
         } catch {
             throw AppError.parse
         }
