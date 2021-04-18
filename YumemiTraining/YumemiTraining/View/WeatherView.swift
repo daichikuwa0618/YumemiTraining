@@ -16,6 +16,7 @@ protocol WeatherViewProtocol: UIView {
     var delegate: WeatherViewDelegate? { get set }
 
     func setWeatherImage(image: UIImage, color: UIColor)
+    func setTemperature(max: Int?, min: Int?)
 }
 
 final class WeatherView: UIView, WeatherViewProtocol {
@@ -135,5 +136,15 @@ final class WeatherView: UIView, WeatherViewProtocol {
     func setWeatherImage(image: UIImage, color: UIColor) {
         weatherImageView.image = image
         weatherImageView.tintColor = color
+    }
+
+    func setTemperature(max: Int?, min: Int?) {
+        if let max = max {
+            maxTemperatureLabel.text = String(describing: max)
+        }
+
+        if let min = min {
+            minTemperatureLabel.text = String(describing: min)
+        }
     }
 }
