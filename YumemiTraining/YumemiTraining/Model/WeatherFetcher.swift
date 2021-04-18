@@ -31,7 +31,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
         do {
             let nowDateString: String = dateFormatter.createString(from: Date())
             let inputJsonString: String = #"{"area": "Tokyo", "date": "\#(nowDateString)"}"#
-            let fetchedData: Data = try YumemiWeather.fetchWeather(inputJsonString).data(using: .utf8)!
+            let fetchedData: Data = try Data(YumemiWeather.fetchWeather(inputJsonString).utf8)
 
             let response = try parseWeatherResponse(from: fetchedData)
 
