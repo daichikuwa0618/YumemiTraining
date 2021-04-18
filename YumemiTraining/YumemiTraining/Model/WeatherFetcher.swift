@@ -35,6 +35,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
             let response = try parseWeatherResponse(from: fetchedData)
 
             return response
+
         } catch YumemiWeatherError.invalidParameterError {
             throw AppError.invalidParameter
 
@@ -71,6 +72,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
             let value: WeatherResponse = try decoder.decode(WeatherResponse.self, from: data)
 
             return value
+
         } catch {
             throw AppError.parse
         }
@@ -86,6 +88,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
             let data: Data = try encoder.encode(object)
 
             return String(decoding: data, as: UTF8.self)
+
         } catch {
             throw AppError.parse
         }
