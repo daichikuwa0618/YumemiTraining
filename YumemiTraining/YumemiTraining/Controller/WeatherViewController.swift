@@ -9,14 +9,20 @@ import UIKit
 
 final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
+    // MARK: - Private property
+
     private let weatherView: WeatherViewProtocol = WeatherView()
     private let weatherFetcher: WeatherFetcherProtocol = WeatherFetcher(dateFormatter: DateFormatterUtil())
+
+    // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupWeatherView()
     }
+
+    // MARK: - Private method
 
     private func setupWeatherView() {
         view.addSubview(weatherView)
@@ -38,7 +44,10 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     func reload() {
         do {
-            let viewEntity = try weatherFetcher.fetch()
+            let response = try weatherFetcher.fetch()
+            let viewEntity = WeatherViewEntity(weather: response.weather,
+                                               maxTemperature: response.maxTemperature,
+                                               minTemperature: response.minTemperature)
             let viewState = WeatherViewState(weather: viewEntity.weather)
 
             weatherView.setWeatherImage(image: viewState.image,

@@ -29,13 +29,13 @@ final class WeatherFetcher: WeatherFetcherProtocol {
 
     func fetch() throws -> WeatherResponse {
         do {
-            let nowDateString: String = dateFormatter.createString(from: Date())
-            let inputJsonString: String = #"{"area": "Tokyo", "date": "\#(nowDateString)"}"#
+            let inputJsonString: String = try createPostJSONString(with: Date())
             let fetchedData: Data = try Data(YumemiWeather.fetchWeather(inputJsonString).utf8)
 
             let response = try parseWeatherResponse(from: fetchedData)
 
             return response
+
         } catch YumemiWeatherError.invalidParameterError {
             throw AppError.invalidParameter
 
@@ -68,24 +68,27 @@ final class WeatherFetcher: WeatherFetcherProtocol {
 
     private func parseWeatherResponse(from data: Data) throws -> WeatherResponse {
         do {
-            guard let jsonDictionary = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let weatherValue = jsonDictionary["weather"] as? String,
-                  let weather = createWeather(from: weatherValue),
-                  let maxTempValue = jsonDictionary["max_temp"] as? Int,
-                  let minTempValue = jsonDictionary["min_temp"] as? Int,
-                  let dateValue = jsonDictionary["date"] as? String,
-                  let date = dateFormatter.createDate(from: dateValue) else {
-                throw AppError.parse
-            }
+            let decoder: JSONDecoder = JSONDecoder()
+            let value: WeatherResponse = try decoder.decode(WeatherResponse.self, from: data)
 
-            let response = WeatherResponse(
-                weather: weather,
-                maxTemperature: maxTempValue,
-                minTemperature: minTempValue,
-                date: date
-            )
+            return value
 
-            return response
+        } catch {
+            throw AppError.parse
+        }
+    }
+
+    private func createPostJSONString(with date: Date) throws -> String {
+        do {
+            let encoder: JSONEncoder = JSONEncoder()
+            let dateString: String = dateFormatter.createString(from: date)
+            let object: WeatherPostObject = WeatherPostObject(area: "Tokyo",
+                                                              dateString: dateString)
+
+            let data: Data = try encoder.encode(object)
+
+            return String(decoding: data, as: UTF8.self)
+
         } catch {
             throw AppError.parse
         }
