@@ -50,7 +50,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
         }
     }
 
-    private func createWeather(from string: String) throws -> Weather {
+    private func createWeather(from string: String) -> Weather? {
         switch string {
         case "sunny":
             return .sunny
@@ -62,7 +62,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
             return .rainy
 
         default:
-            throw AppError.parse
+            return nil
         }
     }
 
@@ -70,6 +70,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
         do {
             guard let jsonDictionary = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let weatherValue = jsonDictionary["weather"] as? String,
+                  let weather = createWeather(from: weatherValue),
                   let maxTempValue = jsonDictionary["max_temp"] as? Int,
                   let minTempValue = jsonDictionary["min_temp"] as? Int,
                   let dateValue = jsonDictionary["date"] as? String,
@@ -78,7 +79,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
             }
 
             let response = WeatherResponse(
-                weather: try createWeather(from: weatherValue),
+                weather: weather,
                 maxTemperature: maxTempValue,
                 minTemperature: minTempValue,
                 date: date
