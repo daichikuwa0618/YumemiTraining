@@ -68,23 +68,10 @@ final class WeatherFetcher: WeatherFetcherProtocol {
 
     private func parseWeatherResponse(from data: Data) throws -> WeatherResponse {
         do {
-            guard let jsonDictionary = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let weatherValue = jsonDictionary["weather"] as? String,
-                  let weather = createWeather(from: weatherValue),
-                  let maxTempValue = jsonDictionary["max_temp"] as? Int,
-                  let minTempValue = jsonDictionary["min_temp"] as? Int,
-                  let dateString = jsonDictionary["date"] as? String else {
-                throw AppError.parse
-            }
+            let decoder: JSONDecoder = JSONDecoder()
+            let value: WeatherResponse = try decoder.decode(WeatherResponse.self, from: data)
 
-            let response = WeatherResponse(
-                weather: weather,
-                maxTemperature: maxTempValue,
-                minTemperature: minTempValue,
-                dateString: dateString
-            )
-
-            return response
+            return value
         } catch {
             throw AppError.parse
         }
