@@ -39,7 +39,7 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     // MARK: - WeatherViewDelegate
     func close() {
-        print("close")
+        dismiss(animated: true)
     }
 
     func reload() {
