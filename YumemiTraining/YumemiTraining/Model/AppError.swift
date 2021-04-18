@@ -9,6 +9,7 @@ import Foundation
 
 enum AppError: Swift.Error {
     case invalidParameter
+    case parse
     case unknown
     case unexpected
 }
