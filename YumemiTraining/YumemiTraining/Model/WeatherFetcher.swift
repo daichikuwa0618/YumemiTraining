@@ -73,8 +73,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
                   let weather = createWeather(from: weatherValue),
                   let maxTempValue = jsonDictionary["max_temp"] as? Int,
                   let minTempValue = jsonDictionary["min_temp"] as? Int,
-                  let dateValue = jsonDictionary["date"] as? String,
-                  let date = dateFormatter.createDate(from: dateValue) else {
+                  let dateString = jsonDictionary["date"] as? String else {
                 throw AppError.parse
             }
 
@@ -82,7 +81,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
                 weather: weather,
                 maxTemperature: maxTempValue,
                 minTemperature: minTempValue,
-                date: date
+                dateString: dateString
             )
 
             return response

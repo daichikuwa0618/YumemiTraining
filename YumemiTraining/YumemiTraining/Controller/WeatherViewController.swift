@@ -38,7 +38,10 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     func reload() {
         do {
-            let viewEntity = try weatherFetcher.fetch()
+            let response = try weatherFetcher.fetch()
+            let viewEntity = WeatherViewEntity(weather: response.weather,
+                                               maxTemperature: response.maxTemperature,
+                                               minTemperature: response.minTemperature)
             let viewState = WeatherViewState(weather: viewEntity.weather)
 
             weatherView.setWeatherImage(image: viewState.image,

@@ -7,9 +7,16 @@
 
 import Foundation
 
-struct WeatherResponse {
+struct WeatherResponse: Decodable {
     let weather: Weather
     let maxTemperature: Int
     let minTemperature: Int
-    let date: Date
+    let dateString: String
+
+    private enum CodingKeys: String, CodingKey {
+        case weather
+        case maxTemperature = "max_temp"
+        case minTemperature = "min_temp"
+        case dateString = "date"
+    }
 }
