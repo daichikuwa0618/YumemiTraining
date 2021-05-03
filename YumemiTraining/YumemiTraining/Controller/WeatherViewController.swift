@@ -5,6 +5,7 @@
 //  Created by Daichi Hayashi on 2021/04/10.
 //
 
+import Foundation
 import UIKit
 
 final class WeatherViewController: UIViewController, WeatherViewDelegate {
@@ -20,6 +21,7 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
         super.viewDidLoad()
 
         setupWeatherView()
+        setupNotificationCenter()
     }
 
     // MARK: - Private method
@@ -37,11 +39,20 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
         ])
     }
 
+    private func setupNotificationCenter() {
+        let center: NotificationCenter = NotificationCenter.default
+        center.addObserver(self,
+                           selector: #selector(reload),
+                           name: UIApplication.didBecomeActiveNotification,
+                           object: nil)
+    }
+
     // MARK: - WeatherViewDelegate
     func close() {
         dismiss(animated: true)
     }
 
+    @objc
     func reload() {
         do {
             let response = try weatherFetcher.fetch()
