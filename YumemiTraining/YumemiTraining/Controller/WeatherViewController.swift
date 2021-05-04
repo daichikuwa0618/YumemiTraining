@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 import UIKit
 
 protocol LoadingView: UIView {
@@ -13,13 +14,13 @@ protocol LoadingView: UIView {
     func stop()
 }
 
-final class WeatherViewController: UIViewController, WeatherViewDelegate {
+final class WeatherViewController: UIViewController, WeatherViewDelegate, WeatherFetcherDelegate {
 
     // MARK: - Private property
 
     private let weatherView: WeatherViewProtocol
     private let loadingView: LoadingView
-    private let weatherFetcher: WeatherFetcherProtocol
+    private var weatherFetcher: WeatherFetcherProtocol
 
     // MARK: - initializer
 
@@ -35,10 +36,16 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
 
+    deinit {
+        Logger().info("WeatherViewController has been deinitialized.")
+    }
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        weatherFetcher.delegate = self
 
         setupWeatherView()
         setupNotificationCenter()
@@ -92,6 +99,50 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
         loadingView.isHidden = true
     }
 
+    func updateWeatherView(from response: WeatherResponse) {
+        let viewEntity = WeatherViewEntity(weather: response.weather,
+                                           maxTemperature: response.maxTemperature,
+                                           minTemperature: response.minTemperature)
+        let viewState = WeatherViewState(weather: viewEntity.weather)
+
+        self.weatherView.setWeatherImage(image: viewState.image,
+                                         color: viewState.color)
+        self.weatherView.setTemperature(max: viewEntity.maxTemperature,
+                                        min: viewEntity.minTemperature)
+    }
+
+    func showErrorAlert(_ error: Error) {
+        if let error = error as? AppError {
+            let message: String = {
+                switch error {
+                case .invalidParameter:
+                    return "入力された値が不正です"
+
+                case .parse:
+                    return "情報の変換に失敗しました"
+
+                case .unknown:
+                    return "不明なエラーです"
+
+                case .unexpected:
+                    return "予期せぬエラーです"
+                }
+            }()
+
+            let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
+                                                                       message: message)
+
+            self.present(alert, animated: true)
+
+        } else {
+            assertionFailure("unexpected")
+            let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
+                                                                       message: "予期せぬエラーです")
+
+            self.present(alert, animated: true)
+        }
+    }
+
     // MARK: - WeatherViewDelegate
     func close() {
         dismiss(animated: true)
@@ -103,62 +154,22 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
             self.showLoadingView()
         }
 
-        weatherFetcher.fetch { [weak self] result in
-            guard let self = self else { return }
+        weatherFetcher.fetch()
+    }
 
-            do {
-                let response = try result.get()
-                let viewEntity = WeatherViewEntity(weather: response.weather,
-                                                   maxTemperature: response.maxTemperature,
-                                                   minTemperature: response.minTemperature)
-                let viewState = WeatherViewState(weather: viewEntity.weather)
+    // MARK: - WeatherFetcherDelegate
 
-                DispatchQueue.main.async {
-                    self.weatherView.setWeatherImage(image: viewState.image,
-                                                     color: viewState.color)
-                    self.weatherView.setTemperature(max: viewEntity.maxTemperature,
-                                                    min: viewEntity.minTemperature)
+    func handleResponse(_ response: WeatherResponse) {
+        DispatchQueue.main.async {
+            self.updateWeatherView(from: response)
+            self.dismissLoadingView()
+        }
+    }
 
-                    self.dismissLoadingView()
-                }
-
-            } catch let error as AppError {
-                DispatchQueue.main.async {
-                    let message: String = {
-                        switch error {
-                        case .invalidParameter:
-                            return "入力された値が不正です"
-
-                        case .parse:
-                            return "情報の変換に失敗しました"
-
-                        case .unknown:
-                            return "不明なエラーです"
-
-                        case .unexpected:
-                            return "予期せぬエラーです"
-                        }
-                    }()
-
-                    let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
-                                                                               message: message)
-
-                    self.present(alert, animated: true)
-
-                    self.dismissLoadingView()
-                }
-
-            } catch {
-                DispatchQueue.main.async {
-                    assertionFailure("unexpected")
-                    let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
-                                                                               message: "予期せぬエラーです")
-
-                    self.present(alert, animated: true)
-
-                    self.dismissLoadingView()
-                }
-            }
+    func handleError(_ error: AppError) {
+        DispatchQueue.main.async {
+            self.showErrorAlert(error)
+            self.dismissLoadingView()
         }
     }
 }
