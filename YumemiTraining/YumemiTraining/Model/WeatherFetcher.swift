@@ -9,11 +9,22 @@ import Foundation
 
 import YumemiWeather
 
+protocol WeatherFetcherDelegate: AnyObject {
+    func handleResponse(_ response: WeatherResponse)
+    func handleError(_ error: AppError)
+}
+
 protocol WeatherFetcherProtocol {
-    func fetch(completionHandler: @escaping (Result<WeatherResponse, AppError>) -> Void)
+    var delegate: WeatherFetcherDelegate? { get set }
+
+    func fetch()
 }
 
 final class WeatherFetcher: WeatherFetcherProtocol {
+
+    // MARK: - Internal property
+
+    weak var delegate: WeatherFetcherDelegate?
 
     // MARK: - Private property
 
@@ -27,32 +38,28 @@ final class WeatherFetcher: WeatherFetcherProtocol {
 
     // MARK: - WeatherFetcherProtocol
 
-    func fetch(completionHandler: @escaping (Result<WeatherResponse, AppError>) -> Void) {
+    func fetch() {
         DispatchQueue.global().async {
-            let result: Result<WeatherResponse, AppError>
-
             do {
                 let inputJsonString: String = try self.createPostJSONString(with: Date())
                 let fetchedData: Data = try Data(YumemiWeather.syncFetchWeather(inputJsonString).utf8)
 
                 let response = try self.parseWeatherResponse(from: fetchedData)
 
-                result = .success(response)
+                self.delegate?.handleResponse(response)
 
             } catch YumemiWeatherError.invalidParameterError {
-                result = .failure(.invalidParameter)
+                self.delegate?.handleError(.invalidParameter)
 
             } catch YumemiWeatherError.unknownError {
-                result = .failure(.unknown)
+                self.delegate?.handleError(.unknown)
 
             } catch AppError.parse {
-                result = .failure(.parse)
+                self.delegate?.handleError(.parse)
 
             } catch {
-                result = .failure(.unexpected)
+                self.delegate?.handleError(.unexpected)
             }
-
-            completionHandler(result)
         }
     }
 

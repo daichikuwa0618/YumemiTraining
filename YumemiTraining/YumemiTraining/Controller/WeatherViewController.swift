@@ -13,13 +13,13 @@ protocol LoadingView: UIView {
     func stop()
 }
 
-final class WeatherViewController: UIViewController, WeatherViewDelegate {
+final class WeatherViewController: UIViewController, WeatherViewDelegate, WeatherFetcherDelegate {
 
     // MARK: - Private property
 
     private let weatherView: WeatherViewProtocol
     private let loadingView: LoadingView
-    private let weatherFetcher: WeatherFetcherProtocol
+    private var weatherFetcher: WeatherFetcherProtocol
 
     // MARK: - initializer
 
@@ -39,6 +39,8 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        weatherFetcher.delegate = self
 
         setupWeatherView()
         setupNotificationCenter()
@@ -147,23 +149,22 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
             self.showLoadingView()
         }
 
-        weatherFetcher.fetch { [weak self] result in
-            guard let self = self else { return }
+        weatherFetcher.fetch()
+    }
 
-            do {
-                let response = try result.get()
+    // MARK: - WeatherFetcherDelegate
 
-                DispatchQueue.main.async {
-                    self.updateWeatherView(from: response)
-                    self.dismissLoadingView()
-                }
+    func handleResponse(_ response: WeatherResponse) {
+        DispatchQueue.main.async {
+            self.updateWeatherView(from: response)
+            self.dismissLoadingView()
+        }
+    }
 
-            } catch {
-                DispatchQueue.main.async {
-                    self.showErrorAlert(error)
-                    self.dismissLoadingView()
-                }
-            }
+    func handleError(_ error: AppError) {
+        DispatchQueue.main.async {
+            self.showErrorAlert(error)
+            self.dismissLoadingView()
         }
     }
 }
