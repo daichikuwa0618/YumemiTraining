@@ -12,8 +12,21 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     // MARK: - Private property
 
-    private let weatherView: WeatherViewProtocol = WeatherView()
-    private let weatherFetcher: WeatherFetcherProtocol = WeatherFetcher(dateFormatter: DateFormatterUtil())
+    private let weatherView: WeatherViewProtocol
+    private let weatherFetcher: WeatherFetcherProtocol
+
+    // MARK: - initializer
+
+    init(weatherView: WeatherViewProtocol, weatherFetcher: WeatherFetcherProtocol) {
+        self.weatherView = weatherView
+        self.weatherFetcher = weatherFetcher
+
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - Lifecycle
 
