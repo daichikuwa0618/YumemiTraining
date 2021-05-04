@@ -15,6 +15,7 @@ class FirstViewController: UIViewController {
         super.viewDidAppear(animated)
 
         let vc = WeatherViewController(weatherView: WeatherView(),
+                                       loadingView: LoadingViewImpl(),
                                        weatherFetcher: WeatherFetcher(dateFormatter: DateFormatterUtil()))
         vc.modalPresentationStyle = .fullScreen
 

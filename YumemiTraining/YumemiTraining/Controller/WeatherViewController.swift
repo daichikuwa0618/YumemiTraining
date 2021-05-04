@@ -8,17 +8,24 @@
 import Foundation
 import UIKit
 
+protocol LoadingView: UIView {
+    func start()
+    func stop()
+}
+
 final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     // MARK: - Private property
 
     private let weatherView: WeatherViewProtocol
+    private let loadingView: LoadingView
     private let weatherFetcher: WeatherFetcherProtocol
 
     // MARK: - initializer
 
-    init(weatherView: WeatherViewProtocol, weatherFetcher: WeatherFetcherProtocol) {
+    init(weatherView: WeatherViewProtocol, loadingView: LoadingView, weatherFetcher: WeatherFetcherProtocol) {
         self.weatherView = weatherView
+        self.loadingView = loadingView
         self.weatherFetcher = weatherFetcher
 
         super.init(nibName: nil, bundle: nil)
@@ -35,6 +42,7 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
         setupWeatherView()
         setupNotificationCenter()
+        setupLoadingView()
     }
 
     // MARK: - Private method
@@ -60,6 +68,30 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
                            object: nil)
     }
 
+    private func setupLoadingView() {
+        view.addSubview(loadingView)
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
+        loadingView.isUserInteractionEnabled = true
+        loadingView.isHidden = true
+
+        NSLayoutConstraint.activate([
+            loadingView.topAnchor.constraint(equalTo: view.topAnchor),
+            loadingView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            loadingView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        ])
+    }
+
+    private func showLoadingView() {
+        loadingView.isHidden = false
+        loadingView.start()
+    }
+
+    private func dismissLoadingView() {
+        loadingView.stop()
+        loadingView.isHidden = true
+    }
+
     // MARK: - WeatherViewDelegate
     func close() {
         dismiss(animated: true)
@@ -67,45 +99,66 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     @objc
     func reload() {
-        do {
-            let response = try weatherFetcher.fetch()
-            let viewEntity = WeatherViewEntity(weather: response.weather,
-                                               maxTemperature: response.maxTemperature,
-                                               minTemperature: response.minTemperature)
-            let viewState = WeatherViewState(weather: viewEntity.weather)
+        DispatchQueue.main.async {
+            self.showLoadingView()
+        }
 
-            weatherView.setWeatherImage(image: viewState.image,
-                                        color: viewState.color)
-            weatherView.setTemperature(max: viewEntity.maxTemperature,
-                                       min: viewEntity.minTemperature)
+        weatherFetcher.fetch { [weak self] result in
+            guard let self = self else { return }
 
-        } catch let error as AppError {
-            let message: String = {
-                switch error {
-                case .invalidParameter:
-                    return "入力された値が不正です"
+            do {
+                let response = try result.get()
+                let viewEntity = WeatherViewEntity(weather: response.weather,
+                                                   maxTemperature: response.maxTemperature,
+                                                   minTemperature: response.minTemperature)
+                let viewState = WeatherViewState(weather: viewEntity.weather)
 
-                case .parse:
-                    return "情報の変換に失敗しました"
+                DispatchQueue.main.async {
+                    self.weatherView.setWeatherImage(image: viewState.image,
+                                                     color: viewState.color)
+                    self.weatherView.setTemperature(max: viewEntity.maxTemperature,
+                                                    min: viewEntity.minTemperature)
 
-                case .unknown:
-                    return "不明なエラーです"
-
-                case .unexpected:
-                    return "予期せぬエラーです"
+                    self.dismissLoadingView()
                 }
-            }()
 
-            let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
-                                                                       message: message)
+            } catch let error as AppError {
+                DispatchQueue.main.async {
+                    let message: String = {
+                        switch error {
+                        case .invalidParameter:
+                            return "入力された値が不正です"
 
-            present(alert, animated: true)
+                        case .parse:
+                            return "情報の変換に失敗しました"
 
-        } catch {
-            assertionFailure("unexpected")
-            let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
-                                                                       message: "予期せぬエラーです")
-            present(alert, animated: true)
+                        case .unknown:
+                            return "不明なエラーです"
+
+                        case .unexpected:
+                            return "予期せぬエラーです"
+                        }
+                    }()
+
+                    let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
+                                                                               message: message)
+
+                    self.present(alert, animated: true)
+
+                    self.dismissLoadingView()
+                }
+
+            } catch {
+                DispatchQueue.main.async {
+                    assertionFailure("unexpected")
+                    let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
+                                                                               message: "予期せぬエラーです")
+
+                    self.present(alert, animated: true)
+
+                    self.dismissLoadingView()
+                }
+            }
         }
     }
 }
