@@ -10,7 +10,7 @@ import Foundation
 import YumemiWeather
 
 protocol WeatherFetcherProtocol {
-    func fetch() throws -> WeatherResponse
+    func fetch(completionHandler: @escaping (Result<WeatherResponse, AppError>) -> Void)
 }
 
 final class WeatherFetcher: WeatherFetcherProtocol {
@@ -27,26 +27,32 @@ final class WeatherFetcher: WeatherFetcherProtocol {
 
     // MARK: - WeatherFetcherProtocol
 
-    func fetch() throws -> WeatherResponse {
-        do {
-            let inputJsonString: String = try createPostJSONString(with: Date())
-            let fetchedData: Data = try Data(YumemiWeather.fetchWeather(inputJsonString).utf8)
+    func fetch(completionHandler: @escaping (Result<WeatherResponse, AppError>) -> Void) {
+        DispatchQueue.global().async {
+            let result: Result<WeatherResponse, AppError>
 
-            let response = try parseWeatherResponse(from: fetchedData)
+            do {
+                let inputJsonString: String = try self.createPostJSONString(with: Date())
+                let fetchedData: Data = try Data(YumemiWeather.fetchWeather(inputJsonString).utf8)
 
-            return response
+                let response = try self.parseWeatherResponse(from: fetchedData)
 
-        } catch YumemiWeatherError.invalidParameterError {
-            throw AppError.invalidParameter
+                result = .success(response)
 
-        } catch YumemiWeatherError.unknownError {
-            throw AppError.unknown
+            } catch YumemiWeatherError.invalidParameterError {
+                result = .failure(.invalidParameter)
 
-        } catch AppError.parse {
-            throw AppError.parse
+            } catch YumemiWeatherError.unknownError {
+                result = .failure(.unknown)
 
-        } catch {
-            throw AppError.unexpected
+            } catch AppError.parse {
+                result = .failure(.parse)
+
+            } catch {
+                result = .failure(.unexpected)
+            }
+
+            completionHandler(result)
         }
     }
 

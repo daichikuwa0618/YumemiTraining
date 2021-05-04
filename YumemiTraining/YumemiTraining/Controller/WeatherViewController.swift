@@ -67,45 +67,56 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     @objc
     func reload() {
-        do {
-            let response = try weatherFetcher.fetch()
-            let viewEntity = WeatherViewEntity(weather: response.weather,
-                                               maxTemperature: response.maxTemperature,
-                                               minTemperature: response.minTemperature)
-            let viewState = WeatherViewState(weather: viewEntity.weather)
+        weatherFetcher.fetch { [weak self] result in
+            guard let self = self else { return }
 
-            weatherView.setWeatherImage(image: viewState.image,
-                                        color: viewState.color)
-            weatherView.setTemperature(max: viewEntity.maxTemperature,
-                                       min: viewEntity.minTemperature)
+            do {
+                let response = try result.get()
+                let viewEntity = WeatherViewEntity(weather: response.weather,
+                                                   maxTemperature: response.maxTemperature,
+                                                   minTemperature: response.minTemperature)
+                let viewState = WeatherViewState(weather: viewEntity.weather)
 
-        } catch let error as AppError {
-            let message: String = {
-                switch error {
-                case .invalidParameter:
-                    return "入力された値が不正です"
-
-                case .parse:
-                    return "情報の変換に失敗しました"
-
-                case .unknown:
-                    return "不明なエラーです"
-
-                case .unexpected:
-                    return "予期せぬエラーです"
+                DispatchQueue.main.async {
+                    self.weatherView.setWeatherImage(image: viewState.image,
+                                                     color: viewState.color)
+                    self.weatherView.setTemperature(max: viewEntity.maxTemperature,
+                                                    min: viewEntity.minTemperature)
                 }
-            }()
 
-            let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
-                                                                       message: message)
+            } catch let error as AppError {
+                DispatchQueue.main.async {
+                    let message: String = {
+                        switch error {
+                        case .invalidParameter:
+                            return "入力された値が不正です"
 
-            present(alert, animated: true)
+                        case .parse:
+                            return "情報の変換に失敗しました"
 
-        } catch {
-            assertionFailure("unexpected")
-            let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
-                                                                       message: "予期せぬエラーです")
-            present(alert, animated: true)
+                        case .unknown:
+                            return "不明なエラーです"
+
+                        case .unexpected:
+                            return "予期せぬエラーです"
+                        }
+                    }()
+
+                    let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
+                                                                               message: message)
+
+                    self.present(alert, animated: true)
+                }
+
+            } catch {
+                DispatchQueue.main.async {
+                    assertionFailure("unexpected")
+                    let alert: UIAlertController = ErrorAlert.createCloseAlert(title: "エラーが発生しました",
+                                                                               message: "予期せぬエラーです")
+
+                    self.present(alert, animated: true)
+                }
+            }
         }
     }
 }
