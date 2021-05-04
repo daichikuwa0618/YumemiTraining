@@ -8,6 +8,11 @@
 import Foundation
 import UIKit
 
+protocol LoadingView: UIView {
+    func start()
+    func stop()
+}
+
 final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     // MARK: - Private property
