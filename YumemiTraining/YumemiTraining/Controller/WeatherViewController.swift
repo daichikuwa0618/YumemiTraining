@@ -18,12 +18,14 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
     // MARK: - Private property
 
     private let weatherView: WeatherViewProtocol
+    private let loadingView: LoadingView
     private let weatherFetcher: WeatherFetcherProtocol
 
     // MARK: - initializer
 
-    init(weatherView: WeatherViewProtocol, weatherFetcher: WeatherFetcherProtocol) {
+    init(weatherView: WeatherViewProtocol, loadingView: LoadingView, weatherFetcher: WeatherFetcherProtocol) {
         self.weatherView = weatherView
+        self.loadingView = loadingView
         self.weatherFetcher = weatherFetcher
 
         super.init(nibName: nil, bundle: nil)
@@ -40,6 +42,7 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
         setupWeatherView()
         setupNotificationCenter()
+        setupLoadingView()
     }
 
     // MARK: - Private method
@@ -65,6 +68,30 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
                            object: nil)
     }
 
+    private func setupLoadingView() {
+        view.addSubview(loadingView)
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
+        loadingView.isUserInteractionEnabled = true
+        loadingView.isHidden = true
+
+        NSLayoutConstraint.activate([
+            loadingView.topAnchor.constraint(equalTo: view.topAnchor),
+            loadingView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            loadingView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        ])
+    }
+
+    private func showLoadingView() {
+        loadingView.isHidden = false
+        loadingView.start()
+    }
+
+    private func dismissLoadingView() {
+        loadingView.stop()
+        loadingView.isHidden = true
+    }
+
     // MARK: - WeatherViewDelegate
     func close() {
         dismiss(animated: true)
@@ -72,6 +99,10 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
 
     @objc
     func reload() {
+        DispatchQueue.main.async {
+            self.showLoadingView()
+        }
+
         weatherFetcher.fetch { [weak self] result in
             guard let self = self else { return }
 
@@ -87,6 +118,8 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
                                                      color: viewState.color)
                     self.weatherView.setTemperature(max: viewEntity.maxTemperature,
                                                     min: viewEntity.minTemperature)
+
+                    self.dismissLoadingView()
                 }
 
             } catch let error as AppError {
@@ -111,6 +144,8 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
                                                                                message: message)
 
                     self.present(alert, animated: true)
+
+                    self.dismissLoadingView()
                 }
 
             } catch {
@@ -120,6 +155,8 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate {
                                                                                message: "予期せぬエラーです")
 
                     self.present(alert, animated: true)
+
+                    self.dismissLoadingView()
                 }
             }
         }

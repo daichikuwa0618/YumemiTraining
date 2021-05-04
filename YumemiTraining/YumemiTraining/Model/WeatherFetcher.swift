@@ -33,7 +33,7 @@ final class WeatherFetcher: WeatherFetcherProtocol {
 
             do {
                 let inputJsonString: String = try self.createPostJSONString(with: Date())
-                let fetchedData: Data = try Data(YumemiWeather.fetchWeather(inputJsonString).utf8)
+                let fetchedData: Data = try Data(YumemiWeather.syncFetchWeather(inputJsonString).utf8)
 
                 let response = try self.parseWeatherResponse(from: fetchedData)
 
