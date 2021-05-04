@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 import UIKit
 
 protocol LoadingView: UIView {
@@ -33,6 +34,10 @@ final class WeatherViewController: UIViewController, WeatherViewDelegate, Weathe
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        Logger().info("WeatherViewController has been deinitialized.")
     }
 
     // MARK: - Lifecycle
