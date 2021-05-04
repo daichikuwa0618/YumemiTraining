@@ -49,6 +49,22 @@ class WeatherViewControllerTests: XCTestCase {
         XCTAssertEqual(imageView.image, expectation)
     }
 
+    func test_最高気温と最低気温が反映される() {
+        let maxExpectation: Int = .random(in: 1...1000)
+        let minExpectation: Int = .random(in: (-1000)...(-1))
+
+        let response: WeatherResponse = .init(weather: .sunny,
+                                              maxTemperature: maxExpectation,
+                                              minTemperature: minExpectation,
+                                              dateString: "")
+        let vc = prepareForViewTesting(response: response)
+        let labels = getTempLabels(from: vc)
+        vc.reload()
+
+        XCTAssertEqual(labels.max.text!, String(describing: maxExpectation))
+        XCTAssertEqual(labels.min.text!, String(describing: minExpectation))
+    }
+
     private func prepareForViewTesting(response: WeatherResponse) -> WeatherViewController {
         let fetcher: MockWeatherFetcher = .init(isThrow: false, response: response)
 
@@ -66,6 +82,15 @@ class WeatherViewControllerTests: XCTestCase {
         let imageView: UIImageView = stackView.subviews.first(where: { $0 is UIImageView })! as! UIImageView
 
         return imageView
+    }
+
+    private func getTempLabels(from vc: WeatherViewController) -> (max: UILabel, min: UILabel) {
+        let weatherView: WeatherView = vc.view.subviews.first! as! WeatherView
+        weatherView.layoutIfNeeded()
+        let stackView: UIStackView = weatherView.subviews.compactMap { $0 as? UIStackView }.first!
+        let labelStack: UIStackView = stackView.arrangedSubviews.compactMap { $0 as? UIStackView }.first!
+
+        return (labelStack.arrangedSubviews[1] as! UILabel, labelStack.arrangedSubviews[0] as! UILabel)
     }
 }
 
